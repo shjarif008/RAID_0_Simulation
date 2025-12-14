@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 enum RaidStatus {
     RAID_OK,
     RAID_NEEDS_INIT,
@@ -21,13 +23,14 @@ public:
     void inspectDisks();
 
 private:
-    const std::string diskDir = "disks/";
-    const std::vector<std::string> disks = {
+    const string diskDir = "disks/";
+    const vector<string> disks = {
         "disk1.bin", "disk2.bin", "disk3.bin"
     };
 
     size_t stripe;
-    bool diskExists(const std::string& disk);
+    bool diskExists(const string& disk);
 };
 
 #endif
+
