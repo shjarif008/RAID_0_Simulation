@@ -55,7 +55,6 @@ public class RaidUI extends JFrame {
 
         log("RAID UI started");
 
-        // Check initialization at startup
         checkInit();
     }
 
@@ -85,7 +84,7 @@ public class RaidUI extends JFrame {
                 log("RAID not initialized. Please click 'Init' to initialize the array.");
             }
 
-            log(""); // single line break after status check
+            log(""); 
 
         } catch (Exception e) {
             log("ERROR: " + e.getMessage());
@@ -112,7 +111,7 @@ public class RaidUI extends JFrame {
 
             p.waitFor();
 
-            log(""); // single line break after each command output
+            log("");
 
         } catch (Exception e) {
             log("ERROR: " + e.getMessage());
@@ -128,3 +127,4 @@ public class RaidUI extends JFrame {
         SwingUtilities.invokeLater(() -> new RaidUI().setVisible(true));
     }
 }
+
