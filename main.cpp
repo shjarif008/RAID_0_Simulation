@@ -2,17 +2,19 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
+
 void runCommand(RAID0& raid, const std::string& line) {
-    std::stringstream ss(line);
-    std::string cmd;
+    stringstream ss(line);
+    string cmd;
     ss >> cmd;
 
     if (cmd == "init" || cmd == "format") {
         raid.init();
     }
     else if (cmd == "write") {
-        std::string data;
-        std::getline(ss, data);
+        string data;
+        getline(ss, data);
         if (!data.empty() && data[0] == ' ')
             data.erase(0, 1);
         raid.writeUserData(data);
@@ -47,15 +49,16 @@ int main(int argc, char* argv[]) {
 
     raid.checkArray();
 
-    std::cout << "\nCommands:\n  init | format\n  write <text>\n  read\n  inspect\n  status\n  exit\n";
+    cout << "\nCommands:\n  init | format\n  write <text>\n  read\n  inspect\n  status\n  exit\n";
 
-    std::string line;
+    string line;
     while (true) {
-        std::cout << "\nraid0> ";
-        std::getline(std::cin, line);
+        cout << "\nraid0> ";
+        getline(std::cin, line);
         if (line == "exit") break;
         if (!line.empty()) runCommand(raid, line);
     }
 
     return 0;
 }
+
