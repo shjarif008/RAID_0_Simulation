@@ -46,9 +46,41 @@ RaidStatus RAID0::writeUserData(const std::string& data) {
     if (checkArray() != RAID_OK)
         return RAID_NEEDS_INIT;
 
+    // 1. Determine current sizes of all disks
+    std::vector<size_t> diskSizes(disks.size(), 0);
+    for (size_t i = 0; i < disks.size(); i++) {
+        std::ifstream in(diskDir + disks[i], std::ios::binary | std::ios::ate);
+            diskSizes[i] = in.tellg();
+    }
+
+    // 2. Determine starting disk index for next write
     size_t diskIndex = 0;
+    // If all disks are equal size, start from first disk
+    // Otherwise, start from the next disk in sequence (mod disks.size())
+    size_t minSize = diskSizes[0];
+    for (size_t i = 1; i < disks.size(); i++)
+        if (diskSizes[i] < minSize)
+            minSize = diskSizes[i];
+
+    // Offset all disks to same logical start for striping
+    for (size_t i = 0; i < disks.size(); i++)
+        diskSizes[i] -= minSize;
+
+    // Find disk to start writing (next in stripe)
+    for (size_t i = 0; i < disks.size(); i++) {
+        if (diskSizes[i] == 0) {
+            diskIndex = i;
+            break;
+        }
+    }
+
+    // 3. Append new data in stripe pattern
     for (char c : data) {
         std::ofstream out(diskDir + disks[diskIndex], std::ios::binary | std::ios::app);
+        if (!out) {
+            std::cout << "ERROR: Cannot write to " << disks[diskIndex] << "\n";
+            return RAID_CORRUPTED;
+        }
         out << c;
         diskIndex = (diskIndex + 1) % disks.size();
     }
@@ -56,6 +88,7 @@ RaidStatus RAID0::writeUserData(const std::string& data) {
     std::cout << "Write completed\n";
     return RAID_OK;
 }
+
 
 RaidStatus RAID0::readData() {
     if (checkArray() != RAID_OK)
